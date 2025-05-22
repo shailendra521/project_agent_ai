@@ -36,9 +36,9 @@ export default function Home() {
                 <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
                 <a href="#contact" className="text-gray-600 hover:text-gray-900 transition-colors">Contact</a>
               </div>
-              <div className="flex items-center space-x-4">
-                <Link to="/login" className="px-4 py-2 text-hrone-600 hover:text-hrone-700 transition-colors">Login</Link>
-                <Link to="/signup" className="px-4 py-2 bg-hrone-600 text-white rounded-lg hover:bg-hrone-700 transition-all transform hover:scale-105">
+              <div className="flex items-center space-x-2 sm:space-x-4">
+                <Link to="/login" className="px-2 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base text-hrone-600 hover:text-hrone-700 transition-colors">Login</Link>
+                <Link to="/signup" className="px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base bg-green-800 text-white rounded hover:bg-green-900 transition-all transform hover:scale-105">
                   Try for Free
                 </Link>
               </div>
@@ -445,64 +445,62 @@ export default function Home() {
 
             {/* Contact Form */}
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-2xl shadow-xl p-8">
-                <h3 className="text-2xl font-semibold text-gray-900 mb-6">Send us a message</h3>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                        Your Name
-                      </label>
-                      <input
-                        type="text"
-                        id="name"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-hrone-500 focus:border-transparent transition-shadow"
-                        placeholder="John Doe"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                        Work Email
-                      </label>
-                      <input
-                        type="email"
-                        id="email"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-hrone-500 focus:border-transparent transition-shadow"
-                        placeholder="john@company.com"
-                      />
-                    </div>
+              <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-8">
+                <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-4 sm:mb-6">Send us a message</h3>
+                <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                      Your Name
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-hrone-500 focus:border-transparent transition-shadow"
+                      placeholder="John Doe"
+                    />
                   </div>
                   <div>
-                    <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                      Work Email
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-hrone-500 focus:border-transparent transition-shadow"
+                      placeholder="john@company.com"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                       Your Message
                     </label>
                     <textarea
                       id="message"
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      rows={4}
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-hrone-500 focus:border-transparent transition-shadow"
+                      rows={3}
+                      className="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-hrone-500 focus:border-transparent transition-shadow"
                       placeholder="Tell us about your needs..."
                     ></textarea>
                   </div>
-                  <div className="flex items-center space-x-4">
+                  <div className="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4">
                     <button
                       type="submit"
-                      className="flex-1 bg-hrone-600 text-white px-8 py-4 rounded-xl font-medium hover:bg-hrone-700 transform hover:scale-105 transition-all flex items-center justify-center group"
+                      className="w-full sm:flex-1 bg-hrone-600 text-white px-6 py-3 sm:px-8 sm:py-4 rounded-lg font-medium hover:bg-hrone-700 transform hover:scale-105 transition-all flex items-center justify-center group"
                     >
                       Send Message
                       <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                     </button>
                     <Link
                       to="/signup"
-                      className="flex-1 border-2 border-hrone-600 text-hrone-600 px-8 py-4 rounded-xl font-medium hover:bg-hrone-50 transform hover:scale-105 transition-all flex items-center justify-center"
+                      className="w-full sm:flex-1 border-2 border-hrone-600 text-hrone-600 px-6 py-3 sm:px-8 sm:py-4 rounded-lg font-medium hover:bg-hrone-50 transform hover:scale-105 transition-all flex items-center justify-center"
                     >
                       Try for Free
-                      <ChevronRight className="ml-2 h-5 w-5" />
+                      <ChevronRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
                     </Link>
                   </div>
                 </form>

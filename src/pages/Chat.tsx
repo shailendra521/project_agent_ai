@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Brain, Plus, MessageSquare, Settings, LogOut, ChevronRight, Users } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Brain, Plus, MessageSquare, Settings, LogOut, ChevronRight, Users, User, LineChart  } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 type ChatMessage = {
@@ -18,6 +18,20 @@ type Agent = {
 
 export default function Chat() {
   const navigate = useNavigate();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
@@ -27,15 +41,31 @@ export default function Chat() {
     },
   ]);
 
+  // Updated chat history data
+  const chatHistory = [
+    { id: 1, title: 'Analytics Discussion', date: '2024-03-20', preview: 'Last discussion about monthly metrics' },
+    { id: 2, title: 'HR Policy Questions', date: '2024-03-19', preview: 'Leave policy clarifications' },
+    { id: 3, title: 'Performance Review', date: '2024-03-18', preview: 'Q1 performance metrics' },
+    { id: 4, title: 'Team Updates', date: '2024-03-17', preview: 'Weekly team sync discussion' },
+    { id: 5, title: 'Project Planning', date: '2024-03-16', preview: 'Sprint planning conversation' },
+    { id: 6, title: 'Training Session', date: '2024-03-15', preview: 'New tool training discussion' },
+  ];
+
   const [agents] = useState<Agent[]>([
     {
       id: '1',
+      name: 'Analytics Agent',
+      description: 'Provides insights and answers related to analytics, metrics, and data trends',
+      icon: <LineChart className="h-6 w-6" />,
+    },
+    {
+      id: '2',
       name: 'General Knowledge Agent',
       description: 'Answers general questions about company policies and procedures',
       icon: <Brain className="h-6 w-6" />,
     },
     {
-      id: '2',
+      id: '3',
       name: 'HR Assistant',
       description: 'Handles HR-related queries and documentation',
       icon: <Users className="h-6 w-6" />,
@@ -74,96 +104,137 @@ export default function Chat() {
   return (
     <div className="h-screen flex">
       {/* Sidebar */}
-      <div className="w-80 bg-white border-r flex flex-col">
-        {/* Top section with logo and add button */}
-        <div className="p-4 border-b flex items-center justify-between">
+      <div className="w-[320px] bg-white border-r flex flex-col">
+        {/* Top section with logo */}
+        <div className="px-4 py-3 border-b flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Brain className="h-8 w-8 text-hrone-600" />
+            <Brain className="h-7 w-7 text-hrone-600" />
             <span className="font-semibold text-gray-900">AssistOne</span>
           </div>
           <button 
             onClick={() => navigate('/add-agent')}
-            className="p-2 hover:bg-gray-100 rounded-full" 
+            className="p-1.5 hover:bg-gray-100 rounded-full transition-colors" 
             title="Add new agent"
           >
             <Plus className="h-5 w-5 text-hrone-600" />
           </button>
         </div>
 
-        {/* Agents Section */}
-        <div className="p-4 border-b">
-          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">AI Agents</h2>
-          <div className="space-y-2">
+        {/* Agents Section - Compact Layout */}
+        <div className="px-3 py-2 border-b">
+          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-1 mb-2">AI Agents</h2>
+          <div className="space-y-1">
             {agents.map((agent) => (
               <button
                 key={agent.id}
                 onClick={() => setSelectedAgent(agent.id)}
-                className={`w-full text-left p-3 rounded-lg flex items-center space-x-3 ${
-                  selectedAgent === agent.id ? 'bg-hrone-50 text-hrone-600' : 'hover:bg-gray-50'
+                className={`w-full text-left p-2 rounded-md flex items-center space-x-2.5 transition-all duration-200 ${
+                  selectedAgent === agent.id 
+                    ? 'bg-hrone-50 text-hrone-600 shadow-sm' 
+                    : 'hover:bg-gray-50'
                 }`}
               >
                 <div className={`${selectedAgent === agent.id ? 'text-hrone-600' : 'text-gray-400'}`}>
                   {agent.icon}
                 </div>
-                <div>
-                  <div className="font-medium text-sm">{agent.name}</div>
-                  <div className="text-xs text-gray-500">{agent.description}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-sm truncate">{agent.name}</div>
+                  <div className="text-xs text-gray-500 truncate leading-tight">{agent.description}</div>
                 </div>
               </button>
             ))}
           </div>
         </div>
 
-        {/* Chat History Section */}
-        <div className="p-4 flex-1 overflow-y-auto">
-          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Chat History</h2>
-          <div className="space-y-2">
-            {['Previous Chat 1', 'Previous Chat 2', 'Previous Chat 3'].map((chat, index) => (
+        {/* Enhanced Chat History Section */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="sticky top-0 bg-gray-50 px-3 py-2 border-b z-10">
+            <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-1">Chat History</h2>
+          </div>
+          <div className="p-2 pb-1">
+            {chatHistory.map((chat) => (
               <button
-                key={index}
-                className="w-full text-left p-3 rounded-lg flex items-center space-x-3 hover:bg-gray-50"
+                key={chat.id}
+                className="w-full text-left p-2.5 rounded-md flex items-start space-x-3 hover:bg-gray-50 transition-colors duration-200 mb-1 group"
               >
-                <MessageSquare className="h-5 w-5 text-gray-400" />
-                <span className="text-sm text-gray-700">{chat}</span>
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+                  <MessageSquare className="h-4 w-4 text-gray-500" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-800 truncate">{chat.title}</span>
+                    <span className="text-xs text-gray-400 flex-shrink-0 ml-2">{chat.date}</span>
+                  </div>
+                  <p className="text-xs text-gray-500 truncate mt-0.5 leading-relaxed">{chat.preview}</p>
+                </div>
               </button>
             ))}
           </div>
-        </div>
-
-        {/* Navigation Footer */}
-        <div className="p-4 border-t">
-          <nav className="space-y-2">
-            <Link
-              to="/settings"
-              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 text-gray-700"
-            >
-              <Settings className="h-5 w-5" />
-              <span>Settings</span>
-            </Link>
-            <Link
-              to="/login"
-              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 text-gray-700"
-            >
-              <LogOut className="h-5 w-5" />
-              <span>Sign out</span>
-            </Link>
-          </nav>
         </div>
       </div>
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col bg-gray-50">
-        {/* Chat Header */}
-        <div className="bg-white border-b p-4">
-          <div className="flex items-center space-x-3">
-            {agents.find(a => a.id === selectedAgent)?.icon}
-            <div>
-              <h2 className="font-medium text-gray-900">
-                {agents.find(a => a.id === selectedAgent)?.name}
-              </h2>
-              <p className="text-sm text-gray-500">
-                {agents.find(a => a.id === selectedAgent)?.description}
-              </p>
+        {/* Chat Header with Profile */}
+        <div className="bg-white border-b shadow-sm">
+          <div className="flex items-center justify-between px-6 py-3">
+            <div className="flex items-center space-x-4">
+              <div className="p-2 rounded-xl bg-hrone-50">
+                {agents.find(a => a.id === selectedAgent)?.icon}
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">
+                  {agents.find(a => a.id === selectedAgent)?.name}
+                </h2>
+                <p className="text-sm text-gray-500">
+                  {agents.find(a => a.id === selectedAgent)?.description}
+                </p>
+              </div>
+            </div>
+
+            {/* Profile Menu */}
+            <div className="relative" ref={profileRef}>
+              <button
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                className="flex items-center justify-center w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+              >
+                <User className="h-5 w-5 text-gray-600" />
+              </button>
+
+              {/* Profile Dropdown */}
+              {isProfileOpen && (
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-50">
+                  <div className="px-4 py-3 border-b border-gray-100">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                        <User className="h-6 w-6 text-gray-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium text-gray-900 truncate">Shailendra Malviya</div>
+                        <div className="text-xs text-gray-500 truncate">shailendramalviya159@gmail.com</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="py-1">
+                    <Link
+                      to="/settings"
+                      className="flex items-center space-x-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      <Settings className="h-4 w-4" />
+                      <span>Settings</span>
+                    </Link>
+
+                    <button
+                      onClick={() => navigate('/login')}
+                      className="flex items-center space-x-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors w-full"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      <span>Log out</span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
