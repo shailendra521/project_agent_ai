@@ -1,6 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Brain, Plus, MessageSquare, Settings, LogOut, ChevronRight, Users, User, LineChart  } from 'lucide-react';
+import {
+  Brain, Plus, MessageSquare, Settings, LogOut, ChevronRight,
+  Users, User, LineChart
+} from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import LineChartComponent from "../pages/charts/LineChartComponent";
+import BarChartComponent from "../pages/charts/BarChartComponent";
+import ComposedChartComponent from "../pages/charts/ComposedChartComponent";
+import RadarChartComponent from "../pages/charts/RadarChartComponent";
+import AreaChartComponent from "../pages/charts/AreaChartComponent";
+import PieChartComponent from './charts/PieChartComponent';
 
 type ChatMessage = {
   id: string;
@@ -16,9 +25,19 @@ type Agent = {
   icon: JSX.Element;
 };
 
+const chartData = [
+  { month: 'Jan', sales: 5000, revenue: 2400, profit: 1600 },
+  { month: 'Feb', sales: 10000, revenue: 1398, profit: 1602 },
+  { month: 'Mar', sales: 2000, revenue: 9800, profit: -7800 },
+  { month: 'Apr', sales: 2780, revenue: 3908, profit: -1128 },
+  { month: 'May', sales: 1890, revenue: 4800, profit: -2910 },
+  { month: 'Jun', sales: 2390, revenue: 3800, profit: -1410 },
+];
+
 export default function Chat() {
   const navigate = useNavigate();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [chartType, setChartType] = useState<'line' | 'bar' | 'pie' | 'composed' | 'radar' | 'area' | null>(null);
   const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -86,7 +105,18 @@ export default function Chat() {
       timestamp: new Date(),
     };
 
-    setMessages([...messages, newMessage]);
+    setMessages(prev => [...prev, newMessage]);
+
+    // Check for chart commands
+    const lower = inputMessage.toLowerCase();
+    if (lower.includes("plot line chart")) setChartType("line");
+    else if (lower.includes("plot bar chart")) setChartType("bar");
+    else if (lower.includes("plot pie chart")) setChartType("pie");
+     else if (lower.includes("plot composed chart")) setChartType("composed");
+      else if (lower.includes("plot radar chart")) setChartType("radar");
+      else if (lower.includes("plot area chart")) setChartType("area");
+    else setChartType(null); // No chart keyword found
+
     setInputMessage('');
 
     // Simulate AI response
@@ -178,11 +208,11 @@ export default function Chat() {
         {/* Chat Header with Profile */}
         <div className="bg-white border-b shadow-sm">
           <div className="flex items-center justify-between px-6 py-3">
-            <div className="flex items-center space-x-4">
-              <div className="p-2 rounded-xl bg-hrone-50">
-                {agents.find(a => a.id === selectedAgent)?.icon}
-              </div>
-              <div>
+          <div className="flex items-center space-x-4">
+            <div className="p-2 rounded-xl bg-hrone-50">
+              {agents.find(a => a.id === selectedAgent)?.icon}
+            </div>
+            <div>
                 <h2 className="text-lg font-semibold text-gray-900">
                   {agents.find(a => a.id === selectedAgent)?.name}
                 </h2>
@@ -193,22 +223,22 @@ export default function Chat() {
             </div>
 
             {/* Profile Menu */}
-            <div className="relative" ref={profileRef}>
-              <button
-                onClick={() => setIsProfileOpen(!isProfileOpen)}
+          <div className="relative" ref={profileRef}>
+            <button
+              onClick={() => setIsProfileOpen(!isProfileOpen)}
                 className="flex items-center justify-center w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
-              >
-                <User className="h-5 w-5 text-gray-600" />
-              </button>
+            >
+              <User className="h-5 w-5 text-gray-600" />
+            </button>
 
               {/* Profile Dropdown */}
-              {isProfileOpen && (
+            {isProfileOpen && (
                 <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-50">
                   <div className="px-4 py-3 border-b border-gray-100">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-                        <User className="h-6 w-6 text-gray-600" />
-                      </div>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                      <User className="h-6 w-6 text-gray-600" />
+                    </div>
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-medium text-gray-900 truncate">Shailendra Malviya</div>
                         <div className="text-xs text-gray-500 truncate">shailendramalviya159@gmail.com</div>
@@ -216,47 +246,75 @@ export default function Chat() {
                     </div>
                   </div>
 
-                  <div className="py-1">
+                <div className="py-1">
                     <Link
                       to="/settings"
                       className="flex items-center space-x-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                     >
-                      <Settings className="h-4 w-4" />
-                      <span>Settings</span>
-                    </Link>
+                    <Settings className="h-4 w-4" />
+                    <span>Settings</span>
+                  </Link>
 
                     <button
                       onClick={() => navigate('/login')}
                       className="flex items-center space-x-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors w-full"
                     >
-                      <LogOut className="h-4 w-4" />
-                      <span>Log out</span>
-                    </button>
-                  </div>
+                    <LogOut className="h-4 w-4" />
+                    <span>Log out</span>
+                  </button>
                 </div>
-              )}
+              </div>
+            )}
             </div>
           </div>
         </div>
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              <div
-                className={`max-w-lg rounded-lg p-4 ${
-                  message.sender === 'user'
-                    ? 'bg-hrone-600 text-white'
-                    : 'bg-white text-gray-900'
-                }`}
-              >
-                {message.content}
+          {messages.map((msg) => (
+            <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div className={`max-w-lg rounded-lg p-4 ${msg.sender === 'user' ? 'bg-hrone-600 text-white' : 'bg-white text-gray-900'}`}>
+                {msg.content}
               </div>
             </div>
           ))}
+
+          {selectedAgent === '1' && chartType === 'line' && (
+            <div className="bg-white p-6 rounded-xl shadow-md border max-w-3xl mx-auto w-full">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Line Chart - Monthly Data</h3>
+              <LineChartComponent data={chartData} />
+            </div>
+          )}
+          {selectedAgent === '1' && chartType === 'bar' && (
+            <div className="bg-white p-6 rounded-xl shadow-md border max-w-3xl mx-auto w-full">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Bar Chart - Monthly Data</h3>
+              <BarChartComponent data={chartData} />
+            </div>
+          )}
+          {selectedAgent === '1' && chartType === 'pie' && (
+            <div className="bg-white p-6 rounded-xl shadow-md border max-w-3xl mx-auto w-full">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Pie Chart - Monthly Data</h3>
+              <ComposedChartComponent data={chartData} />
+            </div>
+          )}
+          {selectedAgent === '1' && chartType === 'composed' && (
+            <div className="bg-white p-6 rounded-xl shadow-md border max-w-3xl mx-auto w-full">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Composed Chart - Monthly Data</h3>
+              <PieChartComponent data={chartData} />
+            </div>
+          )}
+          {selectedAgent === '1' && chartType === 'radar' && (
+            <div className="bg-white p-6 rounded-xl shadow-md border max-w-3xl mx-auto w-full">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Radar Chart - Monthly Data</h3>
+              <LineChartComponent data={chartData} />
+            </div>
+          )}
+            {selectedAgent === '1' && chartType === 'area' && (
+            <div className="bg-white p-6 rounded-xl shadow-md border max-w-3xl mx-auto w-full">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Area Chart - Monthly Data</h3>
+              <AreaChartComponent data={chartData} />
+            </div>
+          )}
         </div>
 
         {/* Message Input */}
